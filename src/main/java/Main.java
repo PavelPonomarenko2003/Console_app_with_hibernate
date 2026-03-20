@@ -40,7 +40,7 @@ public class Main {
                     user.setAge(age);
                     user.setCreatedAt(LocalDateTime.now());
 
-                    userDao.saveUser(user);
+                    userDao.save(user);
                     System.out.println("User added successfully!");
                 }
 
@@ -64,7 +64,7 @@ public class Main {
                     user.setAge(age);
                     user.setCreatedAt(LocalDateTime.now());
 
-                    userDao.updateUser(user);
+                    userDao.update(user);
                     System.out.println("User updated successfully!");
                 }
 
@@ -73,12 +73,12 @@ public class Main {
                     long id = scanner.nextLong();
                     scanner.nextLine(); // consume newline
 
-                    userDao.deleteUser(id);
+                    userDao.delete(id);
                     System.out.println("User deleted successfully!");
                 }
 
                 case 4 -> {
-                    List<User> users = userDao.getAllUsers();
+                    List<User> users = userDao.findAll();
                     if (users.isEmpty()) {
                         System.out.println("They are no users!");
                     } else {
