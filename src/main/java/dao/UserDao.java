@@ -19,5 +19,4 @@ public interface UserDao {
 
     public User findById(Long id);
 
-
 }

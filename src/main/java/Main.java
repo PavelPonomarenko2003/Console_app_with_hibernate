@@ -1,14 +1,17 @@
 import dao.UserDao;
 import dao.UserDaoImpl;
 import entity.User;
+import util.UtilForHibernate;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
+import static util.UtilForHibernate.getSessionFactory;
+
 public class Main {
     public static void main(String[] args) {
-        UserDao userDao = new UserDaoImpl();
+        UserDao userDao = new UserDaoImpl(getSessionFactory());
         Scanner scanner = new Scanner(System.in);
 
         boolean running = true;
