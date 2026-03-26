@@ -6,7 +6,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+
 import java.util.List;
+
+import static util.UtilForHibernate.getSessionFactory;
 
 public class UserDaoImpl implements UserDao {
 
@@ -16,16 +19,12 @@ public class UserDaoImpl implements UserDao {
         this.sessionFactory = sessionFactory;
     }
 
-    public SessionFactory getSessionFactory() {
-        return this.sessionFactory;
-    }
-
 
     @Override
     public void save(User user) {
         Session session = getSessionFactory().openSession();
         Transaction transaction = null;
-        try {
+        try (Session session = getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.persist(user);
             System.out.println("User persisted with ID: " + user.getId()); // Проверьте, что тут не null
@@ -45,7 +44,7 @@ public class UserDaoImpl implements UserDao {
     public User update(User user) {
         Session session = getSessionFactory().openSession();
         Transaction transaction = null;
-        try {
+        try (Session session = getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             User updated = (User) session.merge(user);
             transaction.commit();
@@ -62,7 +61,7 @@ public class UserDaoImpl implements UserDao {
     public void delete(Long id) {
         Session session = getSessionFactory().openSession();
         Transaction transaction = null;
-        try {
+        try (Session session = getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             User user = session.get(User.class, id);
             if (user != null) {
@@ -76,19 +75,10 @@ public class UserDaoImpl implements UserDao {
             session.close();
         }
 
-    }
-
     @Override
     public List<User> findAll() {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-
-            List<User> users = session.createQuery("from User", User.class).getResultList();
-
-            transaction.commit(); // Завершаем транзакцию после успешного чтения
-            return users;
+        try (Session session = getSessionFactory().openSession()) {
+            return session.createQuery("from User", User.class).getResultList();
         } catch (Exception exception) {
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
@@ -101,15 +91,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User findById(Long id) {
-        Session session = getSessionFactory().openSession();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-
-            User user = session.get(User.class, id);
-
-            transaction.commit(); // Для чтения commit просто закрывает транзакцию
-            return user;
+        try (Session session = getSessionFactory().openSession()) {
+            return session.get(User.class, id);
         } catch (Exception exception) {
             if (transaction != null) transaction.rollback();
             throw new DaoException("Error finding user", exception);
