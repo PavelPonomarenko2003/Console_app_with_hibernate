@@ -1,11 +1,12 @@
 package entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -16,11 +17,11 @@ public class User {
     private Long id;
 
     @Size(min = 2, max = 50)
-    @NotBlank(message = "name is required field!")
+    @NotNull(message = "name is required field")
     @Column(unique = true)
     private String name;
 
-    @NotBlank(message = "email is required field!")
+    @NotNull(message = "age is required field")
     @Pattern(
             regexp = "^[A-Za-z0-9._%+-]+@mail\\.ru$",
             message = "Email has to be with @mail.ru"
@@ -28,7 +29,6 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "age is required field!")
     private Integer age;
 
     @Column(name = "created_at")
@@ -40,6 +40,12 @@ public class User {
         this.email = email;
         this.age = age;
         this.createdAt = createdAt;
+    }
+
+    public User(String name, String email, Integer age) {
+        this.name = name;
+        this.email = email;
+        this.age = age;
     }
 
     public User() {
@@ -83,6 +89,24 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return Objects.equals(name, user.name) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(age, user.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, email, age);
     }
 
 }

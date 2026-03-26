@@ -42,7 +42,12 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return userDao.findAll();
+        logger.info("Looking for all users");
+        List<User> listOfUsers = userDao.findAll();
+        if(listOfUsers.isEmpty()){
+            logger.info("There are no any users in Database");
+        }
+        return listOfUsers;
     }
 
 }
