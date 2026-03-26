@@ -55,10 +55,20 @@ public class UserDaoImplTest {
 
     }
 
+    @BeforeEach
+    void cleanUp() {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            // Удаляем всех пользователей перед тестом
+            session.createQuery("delete from User").executeUpdate();
+            session.getTransaction().commit();
+        }
+    }
+
     @Test // testing how to save user in Docker container
     public void haveToSaveUser(){
         // Arrange
-        User arrangedUser = new User("Kristy", "Kristy@mail.ru", 21);
+        User arrangedUser = new User("Krist", "Krist@mail.ru", 21);
         arrangedUser.setAge(21);
 
         // Act
@@ -69,8 +79,8 @@ public class UserDaoImplTest {
         try(Session session = sessionFactory.openSession()) {
             User savedUser = session.get(User.class, arrangedUser.getId());
             Assertions.assertNotNull(savedUser, "User have to insist in DB");
-            Assertions.assertEquals("Kristy", savedUser.getName());
-            Assertions.assertEquals("Kristy@mail.ru", savedUser.getEmail());
+            Assertions.assertEquals("Krist", savedUser.getName());
+            Assertions.assertEquals("Krist@mail.ru", savedUser.getEmail());
             Assertions.assertEquals(21, savedUser.getAge());
         }
 
@@ -80,7 +90,7 @@ public class UserDaoImplTest {
     public void haveToUpdateUser(){
 
         // Arrange
-        User arrangedUser = new User("Kristy", "Kristy@mail.ru", 21);
+        User arrangedUser = new User("Krist", "Krist@mail.ru", 21);
         userDao.save(arrangedUser);
         arrangedUser.setName("NewName");
         arrangedUser.setEmail("NewName@mail.ru");
@@ -107,7 +117,7 @@ public class UserDaoImplTest {
     public void haveToDeleteUser(){
 
         // Arrange
-        User arrangedUser = new User("Kristy", "Kristy@mail.ru", 21);
+        User arrangedUser = new User("Krist", "Krist@mail.ru", 21);
         userDao.save(arrangedUser);
         Assertions.assertNotNull(arrangedUser);
         Long arrangedUserId = arrangedUser.getId();
@@ -127,7 +137,7 @@ public class UserDaoImplTest {
     @Test // testing how to find all users in Docker Container
     public void haveToFindAllUsers(){
         // Arrange
-        User arrangedUser1 = new User("Kristy", "Kristy@mail.ru", 21);
+        User arrangedUser1 = new User("Krist", "Krist@mail.ru", 21);
         User arrangedUser2 = new User("Ann", "Ann@mail.ru", 21);
         userDao.save(arrangedUser1);
         userDao.save(arrangedUser2);
@@ -141,7 +151,7 @@ public class UserDaoImplTest {
         Assertions.assertNotNull(actedListOfUsers, "Has not to be null");
         Assertions.assertTrue(actedListOfUsers.size() >= 2, "Should contain at least 2 users");
         List<String> names = actedListOfUsers.stream().map(User::getName).toList();
-        Assertions.assertTrue(names.contains("Kristy"));
+        Assertions.assertTrue(names.contains("Krist"));
         Assertions.assertTrue(names.contains("Ann"));
 
 

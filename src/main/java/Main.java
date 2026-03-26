@@ -1,7 +1,6 @@
 import dao.UserDao;
 import dao.UserDaoImpl;
 import entity.User;
-import util.UtilForHibernate;
 
 import java.time.LocalDateTime;
 import java.util.List;
