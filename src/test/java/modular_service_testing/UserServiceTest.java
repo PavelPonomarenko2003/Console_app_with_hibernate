@@ -1,26 +1,38 @@
 package modular_service_testing;
 
-import dao.UserDao;
-import entity.User;
+import com.example.repository.UserRepository;
+import com.example.dto.UserCreatingDTO;
+import com.example.dto.UserResponseDTO;
+import com.example.dto.UserUpdatingDTO;
+import com.example.entity.UserEntity;
+import com.example.exception.UserNotFoundException;
+import com.example.mapper.UserMapper;
+import com.example.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import service.UserService;
 
 import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    @Mock // DB mocking (insulation)
-    private UserDao userDao;
+    @Mock
+    private UserRepository userRepository;
 
-    @InjectMocks // real service testing
-    private UserService userService;
+    @Mock
+    private UserMapper userMapper;
+
+    @InjectMocks
+    private UserServiceImpl userService;
 
     @BeforeAll
     public static void testingServiceStarted(TestInfo testInfo){
@@ -34,108 +46,82 @@ public class UserServiceTest {
 
     @BeforeEach
     public void certainTestGetStarted(TestInfo testInfo){
-        System.out.println("Test: " + testInfo.getTestMethod() + " get started!");
+        System.out.println("Test: " + testInfo.getDisplayName() + " get started!");
     }
 
     @AfterEach
     public void certainTestGetFinished(TestInfo testInfo){
-        System.out.println("Test: " + testInfo.getTestMethod() + " get finished!");
-    }
-
-    @Test // testing that service get new user
-    public void haveToReturnNewUser(){
-        // Arrange
-        User arrangedUser = new User("Kristy", "Kristy@mail.ru", 19);
-
-        // Act
-        userService.createUser(arrangedUser);
-
-        // Assert
-        Mockito.verify(userDao, Mockito.atLeastOnce()).save(arrangedUser);
-    }
-
-
-    @Test // testing that service get correct data from DB using update operation
-    public void haveToReturnUpdatedUser(){
-        // Arrange
-        User arrangedUser = new User("Kristy", "Kristy@mail.ru", 19);
-        User mockUpdatedUser = new User("NewName", "NewName@mail.ru", 1);
-
-        // Stubbing
-        Mockito.when(userDao.update(arrangedUser)).thenReturn(mockUpdatedUser);
-
-        // Act
-        User actedUser = userService.updateUser(arrangedUser);
-
-        // Assert
-        Assertions.assertNotNull(actedUser);
-        Assertions.assertEquals("NewName", actedUser.getName());
-        Assertions.assertEquals("NewName@mail.ru", actedUser.getEmail());
-        Assertions.assertEquals(1, actedUser.getAge());
-
-        Mockito.verify(userDao, Mockito.atLeastOnce()).update(arrangedUser);
-    }
-
-
-    @Test // testing how to service get data about deleting user
-    public void haveToGetUserForDeleting(){
-        // Arrange
-        User arrangedUser = new User("Kristy", "Kristy@mail.ru", 19);
-        Long idOfArrangedUser = arrangedUser.getId();
-
-        // Stubbing
-        Mockito.when(userDao.findById(idOfArrangedUser)).thenReturn(arrangedUser);
-
-        //Act
-        userService.deleteUser(idOfArrangedUser);
-
-        // Assert
-        Mockito.verify(userDao, Mockito.atLeastOnce()).delete(idOfArrangedUser);
+        System.out.println("Test: " + testInfo.getDisplayName()+ " get finished!");
     }
 
     @Test
-    public void haveToGetListOfAllUsers(){
+    @DisplayName("Test has to return user though DTO!")
+    public void addUserHaveToReturnUserResponseDTO() {
         // Arrange
-        User arrangedUser1 = new User("Kristy1", "Kristy1@mail.ru", 19);
-        User arrangedUser2 = new User("Kristy2", "Kristy2@mail.ru", 19);
-        List<User> arrangedListOfUsers = List.of(arrangedUser1, arrangedUser2);
+        UserCreatingDTO creatingDTO = new UserCreatingDTO("Kristy", "Kristy@mail.ru", 19);
+        UserEntity entity = new UserEntity("Kristy", "Kristy@mail.ru", 19);
+        UserResponseDTO expectedResponse = new UserResponseDTO(1L, "Kristy", "Kristy@mail.ru", 19);
 
-        // Objects with different links for equals and hashcode
-        User user1 = new User("Kristy","Kristy1@mail.ru", 19);
-        User user2 = new User("Kristy", "Kristy1@mail.ru", 19);
-        List<User> expectedList = List.of(user1);
-        List<User> actualList = List.of(user2);
-
-        // Stubbing
-        Mockito.when(userDao.findAll()).thenReturn(arrangedListOfUsers);
+        when(userMapper.convertToEntityWithCreating(creatingDTO)).thenReturn(entity);
+        when(userRepository.save(entity)).thenReturn(entity);
+        when(userMapper.convertToResponseDTO(entity)).thenReturn(expectedResponse);
 
         // Act
-        List<User> actedListOfUsers = userService.getAllUsers();
+        UserResponseDTO actualResponse = userService.addUser(creatingDTO);
 
         // Assert
-        Assertions.assertNotNull(actedListOfUsers);
-        Assertions.assertEquals(2, actedListOfUsers.size());
-        // Checking names consisting
-        List<String> checkAllNames = actedListOfUsers.stream().map(User::getName).toList();
-        Assertions.assertIterableEquals(List.of("Kristy1", "Kristy2"), checkAllNames);
-        // Checking emails consisting
-        List<String> checkAllEmails = actedListOfUsers.stream().map(User::getEmail).toList();
-        Assertions.assertIterableEquals(List.of("Kristy1@mail.ru", "Kristy2@mail.ru"), checkAllEmails);
-
-        // Links comparing
-        Assertions.assertEquals(arrangedListOfUsers, actedListOfUsers);
-
-        // Data comparing using equals
-        Assertions.assertEquals(expectedList, actualList);
-
-
-
-
-
+        assertNotNull(actualResponse);
+        assertEquals(1L, actualResponse.getId());
+        verify(userRepository, times(1)).save(entity);
     }
 
+    @Test
+    @DisplayName("Has to update user's data")
+    public void updateUserHaveToReturnUpdatedUserDTO() {
+        // Arrange
+        Long userId = 1L;
+        UserUpdatingDTO updatingDTO = new UserUpdatingDTO("NewName", "NewName@mail.ru", 20);
+        UserEntity existingUser = new UserEntity("OldName", "Old@mail.ru", 19);
+        UserResponseDTO responseDTO = new UserResponseDTO(userId, "NewName", "NewName@mail.ru", 20);
 
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userMapper.convertToResponseDTO(existingUser)).thenReturn(responseDTO);
 
+        // Act
+        UserResponseDTO result = userService.updateUser(userId, updatingDTO);
 
+        // Assert
+        assertEquals("NewName", result.getName());
+        verify(userMapper).convertToEntityWithUpdating(updatingDTO, existingUser);
+    }
 
+    @Test
+    @DisplayName("Has to throw exception if user wasn't found")
+    public void deleteHaveToThrowExceptionWhenUserNotFound() {
+        // Arrange
+        Long userId = 99L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(UserNotFoundException.class, () -> userService.delete(userId));
+        verify(userRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("Has to return list of users")
+    public void getAllUsersHaveToReturnListOfUsers() {
+        // Arrange
+        List<UserEntity> entities = List.of(new UserEntity(), new UserEntity());
+        List<UserResponseDTO> expectedDtos = List.of(new UserResponseDTO(), new UserResponseDTO());
+
+        when(userRepository.findAll()).thenReturn(entities);
+        when(userMapper.toDTOList(entities)).thenReturn(expectedDtos);
+
+        // Act
+        List<UserResponseDTO> actualList = userService.getAllUsers();
+
+        // Assert
+        assertEquals(2, actualList.size());
+        verify(userRepository).findAll();
+    }
 }

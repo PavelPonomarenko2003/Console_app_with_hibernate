@@ -1,9 +1,6 @@
-package entity;
+package com.example.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 
 import java.time.LocalDateTime;
@@ -11,22 +8,15 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Size(min = 2, max = 50)
-    @NotNull(message = "name is required field")
     @Column(unique = true)
     private String name;
 
-    @NotNull(message = "age is required field")
-    @Pattern(
-            regexp = "^[A-Za-z0-9._%+-]+@mail\\.ru$",
-            message = "Email has to be with @mail.ru"
-    )
     @Column(unique = true)
     private String email;
 
@@ -35,7 +25,7 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public User(Long id, String name, String email, Integer age, LocalDateTime createdAt) {
+    public UserEntity(Long id, String name, String email, Integer age, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -43,13 +33,13 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public User(String name, String email, Integer age) {
+    public UserEntity(String name, String email, Integer age) {
         this.name = name;
         this.email = email;
         this.age = age;
     }
 
-    public User() {
+    public UserEntity() {
     }
 
     public Long getId() {
@@ -98,7 +88,7 @@ public class User {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        User user = (User) o;
+        UserEntity user = (UserEntity) o;
 
         return Objects.equals(name, user.name) &&
                 Objects.equals(email, user.email) &&

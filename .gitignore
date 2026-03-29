@@ -8,8 +8,10 @@ build/
 
 # Logs
 *.log
+/logs/
 
 # OS
 .DS_Store
 Thumbs.db
 
+src/main/java/com/example/socket

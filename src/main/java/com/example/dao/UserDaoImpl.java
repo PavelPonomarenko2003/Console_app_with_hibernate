@@ -1,12 +1,13 @@
-package dao;
+package com.example.dao;
 
-import entity.User;
-import exceptions_handling.DaoException;
+import com.example.entity.UserEntity;
+import com.example.exception.DaoException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.util.List;
+
 
 public class UserDaoImpl implements UserDao {
 
@@ -22,7 +23,7 @@ public class UserDaoImpl implements UserDao {
 
 
     @Override
-    public void save(User user) {
+    public void save(UserEntity user) {
         Session session = getSessionFactory().openSession();
         Transaction transaction = null;
         try {
@@ -42,12 +43,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User update(User user) {
+    public UserEntity update(UserEntity user) {
         Session session = getSessionFactory().openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
-            User updated = (User) session.merge(user);
+            UserEntity updated = (UserEntity) session.merge(user);
             transaction.commit();
             return updated;
         } catch (Exception exception) {
@@ -64,7 +65,7 @@ public class UserDaoImpl implements UserDao {
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
-            User user = session.get(User.class, id);
+            UserEntity user = session.get(UserEntity.class, id);
             if (user != null) {
                 session.remove(user);
             }
@@ -79,13 +80,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<UserEntity> findAll() {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
 
-            List<User> users = session.createQuery("from User", User.class).getResultList();
+            List<UserEntity> users = session.createQuery("from User", UserEntity.class).getResultList();
 
             transaction.commit(); // Завершаем транзакцию после успешного чтения
             return users;
@@ -100,13 +101,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User findById(Long id) {
+    public UserEntity findById(Long id) {
         Session session = getSessionFactory().openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
 
-            User user = session.get(User.class, id);
+            UserEntity user = session.get(UserEntity.class, id);
 
             transaction.commit(); // Для чтения commit просто закрывает транзакцию
             return user;

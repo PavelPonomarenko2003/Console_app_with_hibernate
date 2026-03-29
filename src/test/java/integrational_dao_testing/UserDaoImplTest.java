@@ -1,7 +1,7 @@
 package integrational_dao_testing;
 
-import dao.UserDaoImpl;
-import entity.User;
+import com.example.dao.UserDaoImpl;
+import com.example.entity.UserEntity;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.*;
@@ -37,7 +37,7 @@ public class UserDaoImplTest {
         configuration.setProperty("hibernate.connection.username", postgres.getUsername());
         configuration.setProperty("hibernate.connection.password", postgres.getPassword());
         configuration.setProperty("hibernate.hbm2ddl.auto", "create-drop");
-        configuration.addAnnotatedClass(User.class);
+        configuration.addAnnotatedClass(UserEntity.class);
 
         sessionFactory = configuration.buildSessionFactory();
     }
@@ -49,14 +49,14 @@ public class UserDaoImplTest {
 
 
     @BeforeEach
-    void setUp() {
+    void setingUp() {
         userDao = new UserDaoImpl(sessionFactory); // Information about our db with fabric of session
         System.out.println("UserDao initialized: " + true);
 
     }
 
     @BeforeEach
-    void cleanUp() {
+    void cleaningUp() {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             // Удаляем всех пользователей перед тестом
@@ -68,7 +68,7 @@ public class UserDaoImplTest {
     @Test // testing how to save user in Docker container
     public void haveToSaveUser(){
         // Arrange
-        User arrangedUser = new User("Krist", "Krist@mail.ru", 21);
+        UserEntity arrangedUser = new UserEntity("Krist", "Krist@mail.ru", 21);
         arrangedUser.setAge(21);
 
         // Act
@@ -77,7 +77,7 @@ public class UserDaoImplTest {
 
         // Assert
         try(Session session = sessionFactory.openSession()) {
-            User savedUser = session.get(User.class, arrangedUser.getId());
+            UserEntity savedUser = session.get(UserEntity.class, arrangedUser.getId());
             Assertions.assertNotNull(savedUser, "User have to insist in DB");
             Assertions.assertEquals("Krist", savedUser.getName());
             Assertions.assertEquals("Krist@mail.ru", savedUser.getEmail());
@@ -90,21 +90,21 @@ public class UserDaoImplTest {
     public void haveToUpdateUser(){
 
         // Arrange
-        User arrangedUser = new User("Krist", "Krist@mail.ru", 21);
+        UserEntity arrangedUser = new UserEntity("Krist", "Krist@mail.ru", 21);
         userDao.save(arrangedUser);
         arrangedUser.setName("NewName");
         arrangedUser.setEmail("NewName@mail.ru");
         arrangedUser.setAge(1);
 
         // Act
-        User updatedUser = userDao.update(arrangedUser);
+        UserEntity updatedUser = userDao.update(arrangedUser);
 
         // Assert
         Assertions.assertNotNull(updatedUser);
         Assertions.assertEquals(arrangedUser.getId(), updatedUser.getId(), "Id have to be similar!");
 
         try(Session session = sessionFactory.openSession()) {
-            User updatedUserInDB = session.get(User.class, arrangedUser.getId());
+            UserEntity updatedUserInDB = session.get(UserEntity.class, arrangedUser.getId());
             Assertions.assertEquals("NewName", updatedUserInDB.getName());
             Assertions.assertEquals("NewName@mail.ru", updatedUserInDB.getEmail());
             Assertions.assertEquals(1, updatedUserInDB.getAge());
@@ -117,7 +117,7 @@ public class UserDaoImplTest {
     public void haveToDeleteUser(){
 
         // Arrange
-        User arrangedUser = new User("Krist", "Krist@mail.ru", 21);
+        UserEntity arrangedUser = new UserEntity("Krist", "Krist@mail.ru", 21);
         userDao.save(arrangedUser);
         Assertions.assertNotNull(arrangedUser);
         Long arrangedUserId = arrangedUser.getId();
@@ -127,7 +127,7 @@ public class UserDaoImplTest {
 
         // Assert
         try(Session session = sessionFactory.openSession()) {
-            User assertedUserInDB = session.get(User.class, arrangedUserId);
+            UserEntity assertedUserInDB = session.get(UserEntity.class, arrangedUserId);
             Assertions.assertNull(assertedUserInDB, "This user should no exist!");
         }
 
@@ -137,20 +137,20 @@ public class UserDaoImplTest {
     @Test // testing how to find all users in Docker Container
     public void haveToFindAllUsers(){
         // Arrange
-        User arrangedUser1 = new User("Krist", "Krist@mail.ru", 21);
-        User arrangedUser2 = new User("Ann", "Ann@mail.ru", 21);
+        UserEntity arrangedUser1 = new UserEntity("Krist", "Krist@mail.ru", 21);
+        UserEntity arrangedUser2 = new UserEntity("Ann", "Ann@mail.ru", 21);
         userDao.save(arrangedUser1);
         userDao.save(arrangedUser2);
-        List<User> arrangedListOfUsers = List.of(arrangedUser1, arrangedUser2);
+        List<UserEntity> arrangedListOfUsers = List.of(arrangedUser1, arrangedUser2);
 
         // Act
-        List<User> actedListOfUsers = userDao.findAll();
+        List<UserEntity> actedListOfUsers = userDao.findAll();
 
 
         // Assert
         Assertions.assertNotNull(actedListOfUsers, "Has not to be null");
         Assertions.assertTrue(actedListOfUsers.size() >= 2, "Should contain at least 2 users");
-        List<String> names = actedListOfUsers.stream().map(User::getName).toList();
+        List<String> names = actedListOfUsers.stream().map(UserEntity::getName).toList();
         Assertions.assertTrue(names.contains("Krist"));
         Assertions.assertTrue(names.contains("Ann"));
 
