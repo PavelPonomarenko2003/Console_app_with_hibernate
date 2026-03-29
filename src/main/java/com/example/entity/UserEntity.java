@@ -1,40 +1,31 @@
-package entity;
+package com.example.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Size(min = 2, max = 50)
-    @NotBlank(message = "name is required field!")
     @Column(unique = true)
     private String name;
 
-    @NotBlank(message = "email is required field!")
-    @Pattern(
-            regexp = "^[A-Za-z0-9._%+-]+@mail\\.ru$",
-            message = "Email has to be with @mail.ru"
-    )
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "age is required field!")
     private Integer age;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public User(Long id, String name, String email, Integer age, LocalDateTime createdAt) {
+    public UserEntity(Long id, String name, String email, Integer age, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -42,7 +33,13 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public User() {
+    public UserEntity(String name, String email, Integer age) {
+        this.name = name;
+        this.email = email;
+        this.age = age;
+    }
+
+    public UserEntity() {
     }
 
     public Long getId() {
@@ -83,6 +80,24 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserEntity user = (UserEntity) o;
+
+        return Objects.equals(name, user.name) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(age, user.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, email, age);
     }
 
 }
