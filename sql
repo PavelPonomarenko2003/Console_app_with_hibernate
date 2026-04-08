@@ -6,6 +6,10 @@ CREATE TABLE users (
     created_at TIMESTAMP
 );
 
+CREATE TABLE processed_events (
+    event_id UUID PRIMARY KEY,
+    processed_at TIMESTAMP NOT NULL
+);
 
 INSERT INTO users (name, email, age, created_at)
 VALUES

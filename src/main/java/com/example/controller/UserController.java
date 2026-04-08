@@ -15,16 +15,12 @@ import java.util.List;
 @RequestMapping("/users")
 // using rest controller, working with JSON (btw idk what should I used rest or mvc...)
 public class UserController {
-
-
     // valid to check user input
     // RequestBody - indicate that result of this method has to convert into JSON
 
     // OK return status 200 - successful
-    // NO_CONTENT return status 204 - successful but it doesn't consist any content
+    // NO_CONTENT return status 204 - successful, but it doesn't consist any content
     // CREATED return status 201 - object created successfully
-
-
 
     private final UserService userService;
 
@@ -32,13 +28,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserCreatingDTO userCreatingDTO) {
         UserResponseDTO response = userService.addUser(userCreatingDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable Long id,
             @RequestBody UserUpdatingDTO userUpdatingDTO) {
@@ -46,13 +42,13 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/find/{id}")
     public ResponseEntity<UserResponseDTO> findUserById(@PathVariable Long id) {
         UserResponseDTO user = userService.getUserById(id);
         return ResponseEntity.ok(user);
