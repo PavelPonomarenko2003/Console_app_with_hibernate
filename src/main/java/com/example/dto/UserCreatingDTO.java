@@ -1,32 +1,35 @@
 package com.example.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Schema(description = "Information required to create a new user")
 public class UserCreatingDTO {
 
+    @Schema(description = "User's full name", example = "Alice")
     @Size(min = 2, max = 50)
-    @NotNull(message = "name is required field")
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @NotNull(message = "age is required field")
+    @Schema(
+            description = "User's email address (must be @mail.ru)",
+            example = "Alcie@mail.ru"
+    )
+    @NotBlank(message = "Email is required")
     @Pattern(
             regexp = "^[A-Za-z0-9._%+-]+@mail\\.ru$",
-            message = "Email has to be with @mail.ru"
+            message = "Email must end with @mail.ru"
     )
     private String email;
 
-    @NotNull
-    @Positive(message = "Age has to be positive")
+    @Schema(description = "User's age", example = "25")
+    @NotNull(message = "Age is required")
+    @Positive(message = "Age must be positive")
     private Integer age;
-
-    public UserCreatingDTO() {
-    }
-
 }

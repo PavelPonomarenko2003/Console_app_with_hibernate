@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # 1. Database - PostgreSQL
   db:
     image: postgres:15
     container_name: postgres_db
@@ -14,6 +15,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # 2. Service Discovery for Kafka
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper
@@ -21,6 +23,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
+  # 3. Message Broker - Kafka
   kafka:
     image: confluentinc/cp-kafka:7.4.0
     container_name: kafka_broker
@@ -32,12 +35,31 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      # double listeners first - for other containers , second for our machine
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  # UI for Kafka pretty good stuff!
+  # 4. Your Spring Boot Application
+  # It helps to raise DB, message broker and API with Swagger
+  user-service:
+    build: . # Dockerfile должен лежать в корне проекта
+    container_name: user-service-app
+    depends_on:
+      db:
+        condition: service_healthy # Ждем, пока БД будет готова
+      kafka:
+        condition: service_started
+    ports:
+      - "8080:8080" # Открываем доступ к Swagger
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/user_service
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      # Включаем Swagger внутри докера
+      - SPRINGDOC_SWAGGER_UI_ENABLED=true
+
+  # 5. UI for Kafka (Management Tool)
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
