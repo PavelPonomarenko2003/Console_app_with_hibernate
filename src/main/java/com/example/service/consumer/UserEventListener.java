@@ -39,7 +39,7 @@ public class UserEventListener {
 
         // To prevent stress on kafka, we don't need to process duplicates
         if (processedEventRepository.existsById(event.getEventId())) {
-            System.out.println("Duplicates! Пропускаем событие: " + event.getEventId());
+            System.out.println("Duplicates! Let's skip this event: " + event.getEventId());
             return;
         }
 

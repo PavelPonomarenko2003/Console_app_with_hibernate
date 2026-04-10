@@ -15,7 +15,6 @@ import java.util.List;
 @Testcontainers // tell docker that need to create Container with certain parameters
 public class UserDaoImplTest {
 
-
     @Container // control container running automatically
     // Creating docker-container with postgreSQL
     static final PostgreSQLContainer<?> postgres =
