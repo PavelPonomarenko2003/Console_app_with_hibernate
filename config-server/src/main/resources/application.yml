@@ -1,0 +1,14 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # way to my-configs
+          search-locations: file:///C:/My/Java/projects/Tasks/my-configs/

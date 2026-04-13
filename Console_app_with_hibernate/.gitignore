@@ -1,0 +1,17 @@
+# Maven / Gradle
+target/
+build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Logs
+*.log
+/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+src/main/java/com/example/socket
