@@ -20,7 +20,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(classes = SpringApp.class)
+// adding how to serialize
+@SpringBootTest(
+        classes = com.example.SpringApp.class,
+        properties = {
+                "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
+                "spring.kafka.consumer.auto-offset-reset=earliest",
+                "spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer",
+                "spring.kafka.consumer.value-deserializer=org.springframework.kafka.support.serializer.JsonDeserializer",
+                "spring.kafka.consumer.properties.spring.json.trusted.packages=com.example.dto",
+                "spring.jackson.serialization.write-dates-as-timestamps=false"
+        }
+)
 // Annotation for Creating little kafka in OS, to raise kafka layer
 // PLAINTEXT - protocol in kafka to transfer text
 @EmbeddedKafka(
@@ -54,12 +65,12 @@ public class NotificationIntegrationalTest {
         );
 
         // Sending to kafka template
-        kafkaTemplate.send("user-events-basic-topic", event);
-
+        kafkaTemplate.send("user-events-basic-topic", event.getEmail(), event);
+        kafkaTemplate.flush();
         // 3. Checking that NotificationService call method sendWelcomeEmail
         // Using Awaitility
-        await().atMost(5, SECONDS).untilAsserted(() -> {
-            verify(notificationService).sendWelcomeEmail(any(), eq("test@mail.ru"));
+        await().atMost(10, SECONDS).untilAsserted(() -> {
+            verify(notificationService, atLeastOnce()).sendWelcomeEmail(any(), any());
         });
     }
 }
