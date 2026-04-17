@@ -8,6 +8,7 @@ import com.example.entity.UserEntity;
 import com.example.exception.UserNotFoundException;
 import com.example.mapper.UserMapper;
 import com.example.service.impl.UserServiceImpl;
+import com.example.service.producer.UserEventPublisher;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,6 +31,9 @@ public class UserServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private UserEventPublisher eventPublisher;
 
     @InjectMocks
     private UserServiceImpl userService;

@@ -36,3 +36,17 @@ Circuit Breaker предохранитель, который позволяет 
 
 
 
+///////////////////////////////
+URL Foe entering:
+
+http://localhost:8080/swagger-ui/index.html - Swagger
+
+http://localhost:8761 - Eureka
+
+http://localhost:9090 - Очереди сообщений в Kafka
+
+
+
+
+
+

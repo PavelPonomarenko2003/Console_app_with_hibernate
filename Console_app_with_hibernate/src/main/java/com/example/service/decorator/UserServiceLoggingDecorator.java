@@ -6,6 +6,7 @@ import com.example.dto.UserUpdatingDTO;
 import com.example.service.interfaces.UserService;
 import lombok.extern.slf4j.Slf4j;
 
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class UserServiceLoggingDecorator implements UserService {
     public UserServiceLoggingDecorator(
             // to prevent conflict with implementation
             @Qualifier("userServiceImpl") UserService userService) {
-        this.userService = userService;
+            this.userService = userService;
     }
 
     @Override
@@ -89,5 +90,4 @@ public class UserServiceLoggingDecorator implements UserService {
             throw e;
         }
     }
-
 }

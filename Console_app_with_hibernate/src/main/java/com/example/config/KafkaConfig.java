@@ -1,6 +1,7 @@
 package com.example.config;
 
 import com.example.dto.UserNotificationEventDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -16,21 +17,23 @@ import java.util.Map;
 
 @Configuration
 public class KafkaConfig {
-    // General topic for producer and consumer
     public static final String TOPIC = "user-events-basic-topic";
+
+    @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
+    private String bootstrapServers;
 
     @Bean
     public NewTopic userTopic() {
         return TopicBuilder.name(TOPIC)
-                .partitions(3) // Our partitions for productivity
-                .replicas(3)   // How many brokers will copy our data
+                .partitions(3)
+                .replicas(1)
                 .build();
     }
 
     @Bean
     public ProducerFactory<String, UserNotificationEventDTO> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);

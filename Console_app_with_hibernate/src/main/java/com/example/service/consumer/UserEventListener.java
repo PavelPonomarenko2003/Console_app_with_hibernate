@@ -36,6 +36,7 @@ public class UserEventListener {
     public void userEventHandling(UserNotificationEventDTO event) {
 
         System.out.println("New notification from Kafka!");
+        System.err.println("!!! СООБЩЕНИЕ ПОЛУЧЕНО В СЛУШАТЕЛЕ: " + event);
 
         // To prevent stress on kafka, we don't need to process duplicates
         if (processedEventRepository.existsById(event.getEventId())) {

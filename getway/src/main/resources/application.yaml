@@ -1,7 +1,33 @@
+server:
+  port: 8081
+  forward-headers-strategy: framework
+
 spring:
   application:
     name: api-gateway
-  # Указываем, откуда тянуть всё остальное
-  config:
-    import: "optional:configserver:http://localhost:8888"
 
+  cloud:
+    config:
+      enabled: false
+
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service-route
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/**
+          filters:
+            - PreserveHostHeader
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
+  instance:
+    prefer-ip-address: true
