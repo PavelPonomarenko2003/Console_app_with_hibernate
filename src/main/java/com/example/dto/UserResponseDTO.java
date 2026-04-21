@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.hateoas.RepresentationModel;
 
 
-@Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Data Transfer Object representing a user's profile details")
