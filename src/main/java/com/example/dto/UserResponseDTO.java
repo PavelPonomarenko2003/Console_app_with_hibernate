@@ -3,7 +3,7 @@ package com.example.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class UserResponseDTO {
 
