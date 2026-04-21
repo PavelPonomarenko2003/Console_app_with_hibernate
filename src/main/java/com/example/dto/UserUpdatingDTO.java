@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Information for updating an existing user's profile")
